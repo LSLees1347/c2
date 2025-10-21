@@ -1,8 +1,8 @@
+mod preproc;
+mod lexer;
+
 use std::env;
-use std::process::Command;
 use std::process::exit;
-use std::fs;
-use std::path::{Path, PathBuf};
 
 
 fn main()
@@ -16,44 +16,28 @@ fn main()
 	}
 
 	let source = &args[1];
-	let output: PathBuf = Path::new("output").join("preproc.i");
-
-	if !Path::new(source).exists()
-	{
-		eprintln!("invalid source");
-		exit(1);
-	}
-
-	if let Some(p) = output.parent()
-	{
-		if let Err(e) = fs::create_dir_all(p)
-		{
-			eprintln!("mkdir fail - {}", e);
-			exit(1);
-		}
-	}
-	else
-	{
-		exit(1);
-	}
-
-	// run pre proc
-	let status = Command::new("gcc")
-		.arg("-E")
-		.arg("-P")
-		.arg(source)
-		.arg("-o")
-		.arg(&output)
-		.status()
-		.expect("gcc error");
-
-	if let Some(code) = status.code()
+	let code = preproc::preproc_run(source);
+	if code != 0
 	{
 		exit(code);
 	}
-	else
+
+	let input = std::fs::read_to_string("output/preproc")
+		.expect("failed to read preproc");
+
+	match lexer::lex(&input)
 	{
-		eprintln!("process terminated");
-		exit(1);
+		Ok(tokens) =>
+		{
+			for token in tokens
+			{
+				println!("{:?}", token);
+			}
+		}
+		Err(e) =>
+		{
+			eprintln!("lexer erros: {}", e);
+			exit(1);
+		}
 	}
 }
