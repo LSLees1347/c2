@@ -1,4 +1,7 @@
 {
     "terminal.explorerKind": "external",
-    "makefile.configureOnOpen": true
+    "makefile.configureOnOpen": true,
+    "files.associations": {
+        "ctype.h": "c"
+    }
 }

@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -g
-TARGET = main
+TARGET = c2
 
 $(TARGET): src/main.o src/lexer.o
 	$(CC) $(CFLAGS) -o $(TARGET) src/main.o src/lexer.o
