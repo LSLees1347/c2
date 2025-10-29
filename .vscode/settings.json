@@ -2,6 +2,11 @@
     "terminal.explorerKind": "external",
     "makefile.configureOnOpen": true,
     "files.associations": {
-        "ctype.h": "c"
+        "ctype.h": "c",
+        "string.h": "c",
+        "main.h": "c",
+        "direct.h": "c",
+        "parser.h": "c",
+        "lexer.h": "c"
     }
 }

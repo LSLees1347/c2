@@ -3,12 +3,11 @@
 #include <string.h>
 #include <direct.h>
 
+#include "debug.h"
 #include "lexer.h"
 
-#define fDEBUG (1 << 0)
-
-
 unsigned char flags = 0;
+
 
 int rPreproc(const char* s, const char* pp)
 {

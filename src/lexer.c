@@ -2,8 +2,38 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "debug.h"
+#include "lexer.h"
 
-void chararcter(FILE* f, int c)
+extern unsigned char flags;
+
+token tokens[tokenCap];
+int tokenCount = 0;
+
+
+static void addToken(tokenType type, const char* value)
+{
+    if (tokenCount >= tokenCap)
+    {
+        printf("token cap hit");
+        return;
+    }
+
+    tokens[tokenCount].type = type;
+
+    if (value)
+    {
+        strncpy(tokens[tokenCount].value, value, sizeof(tokens[tokenCount].value));
+    }
+    else
+    {
+        tokens[tokenCount].value[0] = '\0';
+    }
+
+    tokenCount++;
+}
+
+static void chararcter(FILE* f, int c)
 {
     char buffer[64];
     int len = 0;
@@ -19,15 +49,27 @@ void chararcter(FILE* f, int c)
 
     if (strcmp(buffer, "int") == 0)
     {
-        printf("kw_int\n");
+        if (flags & fDEBUG)
+        {
+            printf("T_INT\n");
+        }
+        addToken(T_INT, NULL);
     }
     else if (strcmp(buffer, "return") == 0)
     {
-        printf("kw_ret\n");
+        if (flags & fDEBUG)
+        {
+            printf("T_RETURN\n");
+        }
+        addToken(T_RETURN, NULL);
     }
     else
     {
-        printf("kw_identifier\n");
+        addToken(T_IDENTIFIER, buffer);
+        if (flags & fDEBUG)
+        {
+            printf("T_IDENTIFIER\n");
+        }
     }
 
     //dont overread
@@ -37,7 +79,7 @@ void chararcter(FILE* f, int c)
     }
 }
 
-void digit(FILE* f, int c)
+static void digit(FILE* f, int c)
 {
     char buffer[32];
     int len = 0;
@@ -51,7 +93,12 @@ void digit(FILE* f, int c)
 
     buffer[len] = '\0';
 
-    printf("kw_constant (%s) \n", buffer);
+    if (flags & fDEBUG)
+    {
+        printf("T_CONSTANT (%s) \n", buffer);
+    }
+
+    addToken(T_CONSTANT, buffer);
 
     // dont overread
     if (c != EOF)
@@ -60,81 +107,61 @@ void digit(FILE* f, int c)
     }
 }
 
-int rLexer(const char* file)
+token* rLexer(const char* file)
 {
     FILE* f = fopen(file, "r");
     int c;
 
-    if (f)
+    if (!f)
     {
-        while ((c = fgetc(f)) != EOF)
-        {
-            if (c == '#')
-            {
-                while ((c = fgetc(f)) != EOF && c != '\n')
-                {
-                    continue;
-                }
-            }
+        printf("failed to open preproc\n");
+        return NULL;
+    }
 
-            if (isspace(c))
+    while ((c = fgetc(f)) != EOF)
+    {
+        // rm preproc heading
+        if (c == '#')
+        {
+            while ((c = fgetc(f)) != EOF && c != '\n')
             {
                 continue;
             }
+        }
 
-            switch (c)
+        if (isspace(c))
+        {
+            continue;
+        }
+
+        switch (c)
+        {
+            case '(': addToken(T_OPAR, NULL); if (flags & fDEBUG) printf("T_OPAR\n"); break;
+            case ')': addToken(T_CPAR, NULL); if (flags & fDEBUG) printf("T_CPAR\n"); break;
+            case '{': addToken(T_OBRACE, NULL); if (flags & fDEBUG) printf("T_OBRACE\n"); break;
+            case '}': addToken(T_CBRACE, NULL); if (flags & fDEBUG) printf("T_CBRACE\n"); break;
+            case ';': addToken(T_SCOLON, NULL); if (flags & fDEBUG) printf("T_SCOLON\n"); break;
+            default:
             {
-                case '(':
+                if (isalpha(c) || c == '_')
                 {
-                    printf("kw_oPar\n");
+                    chararcter(f, c);
                     break;
                 }
-                case ')':
+                else if (isdigit(c))
                 {
-                    printf("kw_cPar\n");
+                    digit(f, c);
                     break;
                 }
-                case '{':
+                else
                 {
-                    printf("kw_oBrace\n");
-                    break;
-                }
-                case '}':
-                {
-                    printf("kw_cBrace\n");
-                    break;
-                }
-                case ';':
-                {
-                    printf("kw_sColon\n");
-                    break;
-                }
-                default:
-                {
-                    if (isalpha(c) || c == '_')
-                    {
-                        chararcter(f, c);
-                        break;
-                    }
-                    else if (isdigit(c))
-                    {
-                        digit(f, c);
-                        break;
-                    }
-                    else
-                    {
-                        printf("invalid regex\n");
-                    }
+                    printf("invalid regex: '%c'\n", c);
                 }
             }
         }
     }
-    else
-    {
-        printf("failed to open preproc");
-        return 1;
-    }
 
     fclose(f);
-    return 0;
+    addToken(T_END, NULL);
+    return tokens;
 }

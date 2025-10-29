@@ -1,15 +1,14 @@
 CC = gcc
 CFLAGS = -Wall -g
+SRC = src
+OBJ = $(SRC)/main.o $(SRC)/lexer.o
 TARGET = c2
 
-$(TARGET): src/main.o src/lexer.o
-	$(CC) $(CFLAGS) -o $(TARGET) src/main.o src/lexer.o
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
 
-src/main.o: src/main.c
-	$(CC) $(CFLAGS) -c src/main.c -o src/main.o
-
-src/lexer.o: src/lexer.c
-	$(CC) $(CFLAGS) -c src/lexer.c -o src/lexer.o
+$(SRC)/%.o: $(SRC)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f src/*.o $(TARGET)
+	rm -f $(SRC)/*.o $(TARGET)
