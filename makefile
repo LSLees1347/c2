@@ -6,6 +6,8 @@ TARGET = c2
 
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
+	@echo "Cleaning up object files..."
+	@rm -f $(OBJ)
 
 $(SRC)/%.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

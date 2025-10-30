@@ -28,6 +28,15 @@ int rPreproc(const char* s, const char* pp)
     return 0;
 }
 
+void freeAst(astNode* node)
+{
+    if (!node) return;
+    freeAst(node->left);
+    freeAst(node->right);
+    freeAst(node->body);
+    free(node);
+}
+
 int main(int argc, char *argv[])
 {
     if (argc < 2)
@@ -58,6 +67,8 @@ int main(int argc, char *argv[])
         printf("\nROOT -\n");
         astPrint(root, 0);
     }
+
+    freeAst(root);
 
     return 0;
 }
