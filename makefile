@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g
 SRC = src
-OBJ = $(SRC)/main.o $(SRC)/lexer.o
+OBJ = $(SRC)/main.o $(SRC)/cLexer.o $(SRC)/cParser.o
 TARGET = c2
 
 $(TARGET): $(OBJ)
@@ -10,5 +10,5 @@ $(TARGET): $(OBJ)
 $(SRC)/%.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-clean:
+c:
 	rm -f $(SRC)/*.o $(TARGET)

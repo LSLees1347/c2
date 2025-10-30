@@ -3,18 +3,15 @@
 #include <string.h>
 #include <direct.h>
 
-#include "debug.h"
-#include "lexer.h"
+#include "cDebug.h"
+#include "cLexer.h"
+#include "cParser.h"
 
 unsigned char flags = 0;
 
-
 int rPreproc(const char* s, const char* pp)
 {
-    if (_mkdir("output") != 0 && errno != EEXIST)
-    {
-        return 1;
-    }
+    if (_mkdir("output") != 0 && errno != EEXIST) return 1;
 
     char command[512];
     snprintf(command, sizeof(command), "gcc -E %s -o %s", s, pp);
@@ -22,14 +19,11 @@ int rPreproc(const char* s, const char* pp)
 
     if (call != 0)
     {
-        printf("preproc failed: %d\n", call);
+        printf("\nPREPROC FAILED - %d\n", call);
         return 1;
     }
 
-    if (flags & fDEBUG)
-    {
-        printf("preproc output: %s\n", pp);
-    }
+    if (flags & fDEBUG) printf("\nPREPROC: \n - %s\n\n", pp);
 
     return 0;
 }
@@ -38,7 +32,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        printf("invalid args\n");
+        printf("NULL SOURCE\n");
         return 1;
     }
 
@@ -50,14 +44,19 @@ int main(int argc, char *argv[])
     const char* ogsource = argv[1];
     const char* preproc = "output\\preproc.i";
 
-    if (rPreproc(ogsource, preproc))
-    {
-        return 1;
-    }
+    if (rPreproc(ogsource, preproc)) return 1;
 
-    if (rLexer(preproc))
+    int tCount;
+    token* lexed = rLexer(preproc, &tCount);
+    if (!lexed) return 1;
+
+    printf("\n");
+    astNode* root = rParser(lexed, tCount);
+    if (!root) return 1;
+    if (flags & fDEBUG)
     {
-        return 1;
+        printf("\nROOT -\n");
+        astPrint(root, 0);
     }
 
     return 0;

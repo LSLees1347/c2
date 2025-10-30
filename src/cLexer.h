@@ -1,4 +1,5 @@
-#define tokenCap 2048
+#pragma once
+#define tokenCap 512
 
 typedef enum
 {
@@ -11,6 +12,7 @@ typedef enum
     T_OBRACE,
     T_CBRACE,
     T_SCOLON,
+    T_VOID,
     T_END
 } tokenType;
 
@@ -20,7 +22,4 @@ typedef struct
     char value[64];
 } token;
 
-extern token tokens[tokenCap];
-extern int tokenCount;
-
-token* rLexer(const char* file);
+token* rLexer(const char* file, int* count);
