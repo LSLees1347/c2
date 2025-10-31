@@ -8,6 +8,8 @@
         "direct.h": "c",
         "parser.h": "c",
         "lexer.h": "c",
-        "debug.h": "c"
+        "debug.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c"
     }
 }

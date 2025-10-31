@@ -115,7 +115,7 @@ token* rLexer(const char* file, int* count)
 
     if (flags & fDEBUG)
     {
-        printf("\nLEXED TOKENS: \n");
+        printf("\npreproc.i -> tokens\n");
     }
 
     while ((c = fgetc(f)) != EOF)
@@ -139,6 +139,7 @@ token* rLexer(const char* file, int* count)
                 case '(':
                 {
                     addToken(T_OPAR, NULL);
+                    if (!(flags & fDEBUG)) break;
                     printf(" - T_OPAR\n");
                     break;
                 }
@@ -146,6 +147,7 @@ token* rLexer(const char* file, int* count)
                 case ')':
                 {
                     addToken(T_CPAR, NULL);
+                    if (!(flags & fDEBUG)) break;
                     printf(" - T_CPAR\n");
                     break;
                 }
@@ -153,6 +155,7 @@ token* rLexer(const char* file, int* count)
                 case '{':
                 {
                     addToken(T_OBRACE, NULL);
+                    if (!(flags & fDEBUG)) break;
                     printf(" - T_OBRACE\n");
                     break;
                 }
@@ -160,6 +163,7 @@ token* rLexer(const char* file, int* count)
                 case '}':
                 {
                     addToken(T_CBRACE, NULL);
+                    if (!(flags & fDEBUG)) break;
                     printf(" - T_CBRACE\n");
                     break;
                 }
@@ -167,6 +171,7 @@ token* rLexer(const char* file, int* count)
                 case ';':
                 {
                     addToken(T_SCOLON, NULL);
+                    if (!(flags & fDEBUG)) break;
                     printf(" - T_SCOLON\n");
                     break;
                 }

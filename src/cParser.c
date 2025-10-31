@@ -24,7 +24,7 @@ static void expect(tokenType type)
 {
     if (!peek() || peek()->type != type)
     {
-        printf("Syntax Error: expected %d but got %d\n", type, peek() ? peek()->type : -1);
+        printf("Syntax Error - %d - %d\n", type, peek() ? peek()->type : -1);
         exit(1);
     }
     advance();
@@ -106,7 +106,7 @@ astNode* rParser(token* t, int c)
 
     if (peek()->type != T_IDENTIFIER)
     {
-        printf("Syntax error: expected identifier after 'int'\n");
+        printf("Syntax error - 'int'\n");
         return NULL;
     }
 
@@ -125,7 +125,7 @@ astNode* rParser(token* t, int c)
 
     if (peek()->type != T_CONSTANT)
     {
-        printf("Syntax error: expected constant after 'return'\n");
+        printf("Syntax error - 'return'\n");
         return NULL;
     }
 

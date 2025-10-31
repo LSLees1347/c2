@@ -6,6 +6,7 @@
 #include "cDebug.h"
 #include "cLexer.h"
 #include "cParser.h"
+#include "cGen.h"
 
 unsigned char flags = 0;
 
@@ -23,9 +24,26 @@ int rPreproc(const char* s, const char* pp)
         return 1;
     }
 
-    if (flags & fDEBUG) printf("\nPREPROC: \n - %s\n\n", pp);
-
+    if (flags & fDEBUG)
+    {
+        printf("\nsource.c -> preproc.i\n - %s\n\n", pp);
+    }
     return 0;
+}
+
+void rAssembler(const char* out)
+{
+    char command[256];
+    snprintf(command, sizeof(command), "gcc output\\asm.s -o %s", out);
+
+    int status = system(command);
+    if (status != 0)
+    {
+        printf("%d", status);
+        return;
+    }
+
+    printf("asm.s -> bin.exe\n - %s\n\n", out);
 }
 
 void freeAst(astNode* node)
@@ -64,10 +82,14 @@ int main(int argc, char *argv[])
     if (!root) return 1;
     if (flags & fDEBUG)
     {
-        printf("\nROOT -\n");
+        printf("\ntokens -> AST\n");
+        printf("ROOT\n");
         astPrint(root, 0);
     }
 
+    rCodeGen(root, "output\\asm.s");
+    printf("\n\nast -> asm.s\n");
+    rAssembler("output\\bin.exe");
     freeAst(root);
 
     return 0;
